@@ -1,8 +1,8 @@
-CC = gcc                     # Compiler
-CFLAGS = -Wall -Wextra -Werror  # Compiler flags (warn about errors)
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -D__USE_MINGW_ANSI_STDIO=1 -mconsole
 SRC = src/main.c src/builtins.c src/execute.c src/redirect.c src/pipe.c src/signals.c src/env.c src/history.c
-OBJ = $(SRC:.c=.o)            # Object files (compiled .o files)
-TARGET = minishell            # Output executable file
+OBJ = $(SRC:.c=.o)
+TARGET = minishell
 
 all: $(TARGET)
 
