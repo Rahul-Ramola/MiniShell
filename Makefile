@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
-SRC = src/main.c src/builtins.c src/execute.c src/redirect.c src/pipe.c src/signals.c src/env.c src/history.c
-OBJ = $(SRC:.c=.o)
+CFLAGS = -Wall -Wextra -g -Iinclude
 TARGET = minishell
+SRC = src/main.c src/builtins.c src/execute.c
+OBJ = $(SRC:.c=.o)
 
 all: $(TARGET)
 
