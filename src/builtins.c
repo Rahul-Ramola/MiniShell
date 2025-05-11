@@ -28,7 +28,9 @@ int handle_builtin(char **args) {
         }
         return 1;
     } else if (strcmp(args[0], "echo") == 0) {
-        printf("🗣️ ");
+        if (isatty(STDOUT_FILENO)) {
+            printf("🗣️ ");
+        }
         for (int j = 1; args[j] != NULL; j++) {
             printf("%s ", args[j]);
         }

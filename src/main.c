@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>  
+#include <fcntl.h>    
+
 
 #include "builtins.h"
 #include "execute.h"
+#include "redirect.h"
 
 #define MAX_INPUT 1024
 #define MAX_ARGS 100
@@ -33,11 +37,22 @@ void shell_loop() {
 
         if (args[0] == NULL) continue;
 
+    if (handle_redirection(args) != 0) {
+        restore_redirection();  // 🔧 always restore even after failure
+        continue;
+    }                 // 🔁 May modify STDOUT
+
         if (handle_builtin(args)) {
-            continue;  // already executed
+            restore_redirection();
+            continue;
         }
 
-        execute_command(args);  // external command
+        execute_command(args);
+
+        restore_redirection();
+
+
+        
     }
 }
 
