@@ -4,11 +4,17 @@
 #include <unistd.h>  
 #include <fcntl.h>    
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
 
 #include "builtins.h"
 #include "execute.h"
 #include "redirect.h"
 #include "pipe.h"
+#include "env.h"
+#include "history.h"
+#include "tokenizer.h"
 
 #define MAX_INPUT 1024
 #define MAX_ARGS 100
@@ -16,25 +22,37 @@
 void shell_loop() {
     char input[MAX_INPUT];
     char *args[MAX_ARGS];
-
+    
     while (1) {
-        printf("🐚 MiniShell> ");
-        fflush(stdout);
+        // printf("🐚 MiniShell> ");
+        // fflush(stdout);
 
-        if (fgets(input, MAX_INPUT, stdin) == NULL) {
+        // if (fgets(input, MAX_INPUT, stdin) == NULL) {
+        //     printf("\n👋 Exiting MiniShell...\n");
+        //     break;
+        // }
+
+        // input[strcspn(input, "\n")] = 0;  // Trim newline
+        // add_to_history(input);
+
+        char *line = readline("🐚 MiniShell> ");
+        if (!line) {
             printf("\n👋 Exiting MiniShell...\n");
             break;
         }
 
-        input[strcspn(input, "\n")] = 0;
-
-        int i = 0;
-        char *token = strtok(input, " ");
-        while (token != NULL && i < MAX_ARGS - 1) {
-            args[i++] = token;
-            token = strtok(NULL, " ");
+        if (strlen(line) > 0) {
+            add_history(line);         // readline history
+            add_to_history(line);      // your internal history
         }
-        args[i] = NULL;
+
+        strncpy(input, line, MAX_INPUT);
+        free(line);
+
+
+        tokenize_input(input, args);
+
+        expand_variables(args);
 
         if (args[0] == NULL) continue;
 
@@ -51,8 +69,20 @@ void shell_loop() {
             continue;
         }                 // 🔁 May modify STDOUT
 
+        if (strcmp(args[0], "history") == 0) {
+            show_history();
+            restore_redirection();
+            continue;
+        }
+
+
         if (handle_builtin(args)) {
             restore_redirection();
+            continue;
+        }
+
+        if (handle_env_builtin(args)) {
+            restore_redirection(); // still needed after any command
             continue;
         }
 
