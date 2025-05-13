@@ -1,0 +1,10 @@
+builtins.c
+env.c
+execute.c
+execute.o
+history.c
+main.c
+pipe.c
+redirect.c
+redirect.o
+signals.c

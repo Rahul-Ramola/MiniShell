@@ -38,5 +38,5 @@ int handle_builtin(char **args) {
         return 1;
     }
 
-    return 0; // Not a built-in
+    return 0; 
 }

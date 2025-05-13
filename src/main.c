@@ -8,6 +8,7 @@
 #include "builtins.h"
 #include "execute.h"
 #include "redirect.h"
+#include "pipe.h"
 
 #define MAX_INPUT 1024
 #define MAX_ARGS 100
@@ -37,10 +38,18 @@ void shell_loop() {
 
         if (args[0] == NULL) continue;
 
-    if (handle_redirection(args) != 0) {
-        restore_redirection();  // 🔧 always restore even after failure
-        continue;
-    }                 // 🔁 May modify STDOUT
+        if (is_pipeline(args)) {
+            char *commands[MAX_COMMANDS][MAX_ARGS] = {0};
+            int num_cmds = split_pipeline(args, commands);
+            execute_pipeline(commands, num_cmds);
+            continue;
+        }
+
+
+        if (handle_redirection(args) != 0) {
+            restore_redirection();  // 🔧 always restore even after failure
+            continue;
+        }                 // 🔁 May modify STDOUT
 
         if (handle_builtin(args)) {
             restore_redirection();

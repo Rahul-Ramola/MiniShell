@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g -Iinclude
 TARGET = minishell
-SRC = src/main.c src/builtins.c src/execute.c src/redirect.c
+SRC = src/main.c src/builtins.c src/execute.c src/redirect.c src/pipe.c
 
 OBJ = $(SRC:.c=.o)
 
