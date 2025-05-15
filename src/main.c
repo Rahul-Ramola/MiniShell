@@ -15,6 +15,7 @@
 #include "env.h"
 #include "history.h"
 #include "tokenizer.h"
+#include "custom.h"
 
 #define MAX_INPUT 1024
 #define MAX_ARGS 100
@@ -83,6 +84,11 @@ void shell_loop() {
 
         if (handle_env_builtin(args)) {
             restore_redirection(); // still needed after any command
+            continue;
+        }
+
+        if (handle_custom_builtin(args)) {
+            restore_redirection();
             continue;
         }
 
