@@ -11,13 +11,43 @@ int handle_builtin(char **args) {
         printf("👋 Goodbye!\n");
         exit(0);
     } else if (strcmp(args[0], "cd") == 0) {
-        if (args[1] == NULL) {
-            fprintf(stderr, "⚠️ MiniShell: expected argument to \"cd\"\n");
-        } else if (chdir(args[1]) != 0) {
+        char cwd[1024];
+        char *target_dir = args[1];
+
+        // Save current directory before changing
+        if (getcwd(cwd, sizeof(cwd)) == NULL) {
+            perror("🚫 MiniShell: getcwd");
+            return 1;
+        }
+
+        if (target_dir == NULL) {
+            // No argument: go to HOME
+            target_dir = "/mnt/e/PBL(OS)/MiniShell";
+            if (target_dir == NULL) {
+                fprintf(stderr, "⚠️ MiniShell: HOME not set\n");
+                return 1;
+            }
+        } else if (strcmp(target_dir, "-") == 0) {
+            // Go to previous directory
+            target_dir = getenv("OLDPWD");
+            if (target_dir == NULL) {
+                fprintf(stderr, "⚠️ MiniShell: OLDPWD not set\n");
+                return 1;
+            }
+            printf("%s\n", target_dir);
+        }
+
+        if (chdir(target_dir) != 0) {
             perror("🚫 MiniShell");
         } else {
-            printf("📁 Changed directory to %s\n", args[1]);
+            // Update OLDPWD and PWD
+            setenv("OLDPWD", cwd, 1);
+            if (getcwd(cwd, sizeof(cwd)) != NULL) {
+                setenv("PWD", cwd, 1);
+            }
+            printf("📁 Changed directory to %s\n", target_dir);
         }
+
         return 1;
     } else if (strcmp(args[0], "pwd") == 0) {
         char cwd[1024];

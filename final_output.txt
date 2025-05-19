@@ -1,0 +1,12 @@
+Makefile
+README.md
+docs
+file.txt
+final_output.txt
+include
+minishell
+out.txt
+results.txt
+sorted.txt
+sorted_output.txt
+src

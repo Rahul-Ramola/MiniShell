@@ -19,6 +19,7 @@
 
 #define MAX_INPUT 1024
 #define MAX_ARGS 100
+#define BASE_PATH "/mnt/e/PBL(OS)/MiniShell"
 
 void shell_loop() {
     char input[MAX_INPUT];
@@ -36,7 +37,29 @@ void shell_loop() {
         // input[strcspn(input, "\n")] = 0;  // Trim newline
         // add_to_history(input);
 
-        char *line = readline("🐚 MiniShell> ");
+        char cwd[1024];
+        char prompt[2048];
+
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            if (strstr(cwd, BASE_PATH) == cwd) {
+                const char *relative = cwd + strlen(BASE_PATH);
+                if (*relative == '\0') {
+                    // At root of MiniShell
+                    snprintf(prompt, sizeof(prompt), "🖥  MiniShell> ");
+                } else {
+                    if (*relative == '/') relative++; 
+                    snprintf(prompt, sizeof(prompt), "🖥  MiniShell> %s> ", relative);
+                }
+            } else {
+                snprintf(prompt, sizeof(prompt), "🖥  MiniShell> %s> ", cwd);
+            }
+        } else {
+            snprintf(prompt, sizeof(prompt), "🖥  MiniShell> ");
+        }
+
+        char *line = readline(prompt);
+
+
         if (!line) {
             printf("\n👋 Exiting MiniShell...\n");
             break;
